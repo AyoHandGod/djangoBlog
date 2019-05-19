@@ -28,6 +28,6 @@ def list_categories(request):
 
 def category_details(request, category):
     category = get_object_or_404(Category, slug=category)
-    posts = Post.objects.get(category=category)
+    posts = Post.objects.filter(category=category)
     context = {"category": category, "posts": posts}
     return render(request, 'blog/category/detail.html', context)
