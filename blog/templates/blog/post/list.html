@@ -13,6 +13,14 @@
       <p class="date">
           Published {{ post.publish }} by {{ post.author }}
       </p>
+
+      <p>
+          {% if post.category %}
+          <a href="{{ post.category.get_absolute_url }}"> Category: {{ post.category }} </a>
+          {% else %}
+            Category: Default
+          {% endif %}
+      </p>
       {{ post.body|truncatewords:30|linebreaks }}
     {% endfor %}
 {% endblock %}

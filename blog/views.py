@@ -27,5 +27,5 @@ def list_categories(request):
 
 
 def category_details(request, category):
-    category = get_object_or_404(Category, name=category)
-    return render(request, 'blog/category/detail.html', category)
+    category = get_object_or_404(Category, slug=category)
+    return render(request, 'blog/category/detail.html', {"category": category})

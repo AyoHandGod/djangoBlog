@@ -34,7 +34,6 @@ class Category(models.Model):
     def get_absolute_url(self):
         return reverse('blog:category_details',
                        args=[
-                           self.name,
                            self.slug])
 
 
