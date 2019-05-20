@@ -3,6 +3,8 @@ from .models import Post, Category
 
 
 # Create your views here.
+
+# Post Methods
 def list_post(request):
     posts = Post.objects.all()
     context = {'posts': posts}
@@ -19,6 +21,7 @@ def post_detail(request, year, month, day, post):
                   {'post': post})
 
 
+# category methods
 def list_categories(request):
     categories = Category.objects.all()
     context = {'categories': categories}
