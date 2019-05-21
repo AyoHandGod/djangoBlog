@@ -2,10 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, \
     PageNotAnInteger
 from django.utils.log import AdminEmailHandler
+from django.views.generic import ListView, DetailView
 import logging
 
 from .models import Post, Category
-
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -18,6 +18,14 @@ logger.addHandler(emailHandler)
 
 
 # Post Methods
+
+class PostListView(ListView):
+    queryset = Post.published.all()
+    context_object_name = 'posts'
+    paginate_by = 3
+    template_name = 'blog/post/list.html'
+
+
 def list_post(request):
     posts = Post.objects.all()
     paginator = Paginator(posts, 5)  # posts each page
@@ -32,6 +40,16 @@ def list_post(request):
         posts = paginator.page(paginator.num_pages)
     context = {'posts': posts, 'page': page}
     return render(request, 'blog/post/list.html', context)
+
+
+class PostDetailView(DetailView):
+    model = Post
+    context_object_name = 'post'
+    template_name = 'blog/post/detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
 
 def post_detail(request, year, month, day, post):
