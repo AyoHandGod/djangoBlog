@@ -85,6 +85,18 @@ def list_categories(request):
                   context)
 
 
+class CategoryDetailView(DetailView):
+    model = Category
+    context_object_name = 'category'
+    template_name = 'blog/category/detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.object.blog_posts.all()  # add post objects related to category to context
+        context['posts'] = post
+        return context
+
+
 def category_details(request, category):
     category = get_object_or_404(Category, slug=category)
     posts = Post.objects.filter(category=category)

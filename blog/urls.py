@@ -10,5 +10,5 @@ urlpatterns = [
     path('blog/<int:year>/<int:month>/<int:day>/<slug:slug>/',
          views.PostDetailView.as_view(), name='post_detail'),
     path('categories/', views.CategoryListView.as_view(), name='list_category'),
-    path('categories/<slug:category>/', views.category_details, name='category_details'),
+    path('categories/<slug:slug>/', views.CategoryDetailView.as_view(), name='category_details'),
 ]
