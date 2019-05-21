@@ -9,6 +9,6 @@ urlpatterns = [
     path('', views.PostListView.as_view(), name='list_post'),
     path('blog/<int:year>/<int:month>/<int:day>/<slug:slug>/',
          views.PostDetailView.as_view(), name='post_detail'),
-    path('categories/', views.list_categories, name='list_category'),
+    path('categories/', views.CategoryListView.as_view(), name='list_category'),
     path('categories/<slug:category>/', views.category_details, name='category_details'),
 ]

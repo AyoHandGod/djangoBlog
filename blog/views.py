@@ -63,6 +63,13 @@ def post_detail(request, year, month, day, post):
 
 
 # category methods
+
+class CategoryListView(ListView):
+    queryset = Category.objects.all()
+    context_object_name = 'categories'
+    paginate_by = 3
+    template_name = 'blog/category/list.html'
+
 def list_categories(request):
     categories = Category.objects.all()
     paginator = Paginator(categories, 3)
