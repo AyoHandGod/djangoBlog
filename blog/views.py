@@ -70,6 +70,7 @@ class CategoryListView(ListView):
     paginate_by = 3
     template_name = 'blog/category/list.html'
 
+
 def list_categories(request):
     categories = Category.objects.all()
     paginator = Paginator(categories, 3)
