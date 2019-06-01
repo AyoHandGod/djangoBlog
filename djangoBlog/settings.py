@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import logging
+from logdna import LogDNAHandler
 
 from hidden import SECRET_KEY
 
@@ -18,6 +20,12 @@ from hidden import SECRET_KEY
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+logger = logging.getLogger("Blog Log")
+key = os.environ.get("LOGDNA")
+dnaHandler = LogDNAHandler(key)
+logger.addHandler(dnaHandler)
+
+logging.info("Logger configured", {"app": "Django Blog"})
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -123,3 +131,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
