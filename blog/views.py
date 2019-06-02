@@ -1,23 +1,27 @@
 import logging
+import os
 
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, \
     PageNotAnInteger
-from django.utils.log import AdminEmailHandler
 from django.views.generic import ListView, DetailView, FormView
+
+from logdna import LogDNAHandler
 
 from .models import Post, Category
 from .forms import EmailPostForm
 
-# Create your views here.
+# Logger settings
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 fh = logging.FileHandler('spam.log')
-emailHandler = AdminEmailHandler(include_html=True)
+logDNA = LogDNAHandler(os.environ.get("LOGDNA"))
 logger.addHandler(fh)
-logger.addHandler(emailHandler)
+logger.addHandler(logDNA)
+
+# Create your views here.
 
 
 # Post Methods
@@ -27,6 +31,7 @@ class PostListView(ListView):
     context_object_name = 'posts'
     paginate_by = 3
     template_name = 'blog/post/list.html'
+    logger.info("Post list viewed", {"app": "djangoBlog"})
 
 
 def list_post(request):
@@ -49,6 +54,7 @@ class PostDetailView(DetailView):
     model = Post
     context_object_name = 'post'
     template_name = 'blog/post/detail.html'
+    logger.info("Post details viewed", {"app": "djangoBlog"})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -72,6 +78,7 @@ class CategoryListView(ListView):
     context_object_name = 'categories'
     paginate_by = 3
     template_name = 'blog/category/list.html'
+    logger.info("Category list viewed", {"app": "djangoBlog"})
 
 
 def list_categories(request):
@@ -110,21 +117,35 @@ def category_details(request, category):
 
 class PostShareView(FormView):
     template_name = 'blog/post/share.html'
+    context_object_name = 'form'
     form_class = EmailPostForm
-    success_url = '/thanks/'
     sent = False
 
     def form_valid(self, form):
         form.send_email()
         return super().form_valid(form)
 
-    def post(self, request):
+    def post(self, request, post_id, **kwargs):
+        post = get_object_or_404(Post, id=post_id, status="published")
         form = EmailPostForm(request.POST)
+
         if form.is_valid():
             cd = form.cleaned_data
-            post_url = request.build_absolute_url(
+            subject = '{} ({}) recommends you reading "{}"' \
+                .format(cd['name'], cd['email'], post.title)
+            message = 'Read "{}" at {}\n\n{}\'s comments: {}' \
+                .format(post.title, post.get_absolute_url(), cd['name'], cd['comments'])
+            send_mail(subject, message, 'admin@myblog.com', [cd['to']])
+            self.sent = True
+            logger.info("Email sent out", {"app": "djangoBlog"})
+        else:
+            form = EmailPostForm()
+        return self.render_to_response(self.get_context_data())
 
-            )
+
+    def get_context_data(self, **kwargs):
+        context = super(FormView, self).get_context_data(**kwargs)
+        return context
 
 
 def post_share(request, post_id):
@@ -148,6 +169,7 @@ def post_share(request, post_id):
                 .format(post.title, post_url, cd['name'], cd['comments'])
             send_mail(subject, message, 'admin@myblog.com', [cd['to']])
             sent = True
+            logger.info("Email sent out", {"app": "djangoBlog"})
     else:
         form = EmailPostForm()
     context = {'post': post, 'form': form, 'sent': sent}

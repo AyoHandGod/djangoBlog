@@ -11,5 +11,5 @@ urlpatterns = [
          views.PostDetailView.as_view(), name='post_detail'),
     path('categories/', views.CategoryListView.as_view(), name='list_category'),
     path('categories/<slug:slug>/', views.CategoryDetailView.as_view(), name='category_details'),
-    path('<int:post_id>/share/', views.post_share, name='post_share')
+    path('<int:post_id>/share/', views.PostShareView.as_view(), name='post_share'),
 ]
